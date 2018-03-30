@@ -13,7 +13,6 @@ int pinCS = 4;
 
 String nmea[12];
 String labels[12] {"Time: ", "Lat: ", "N/S: ", "Lng: ", "E/W: ", "Fix: ", "Sats: ", "HDP: ", "Alt: ", "Metres: ", "MSL: ", "Metres: "};
-//
 
 
 void setup() {
@@ -30,8 +29,10 @@ void setup() {
     }
 }
 
+
 void loop() {
 	dataFile = SD.open("gps.csv", FILE_WRITE);
+	
 	//flushing out data at the start of each loop, not sure it is really neccessay
 	Serial.flush();
 	GPSModule.flush();

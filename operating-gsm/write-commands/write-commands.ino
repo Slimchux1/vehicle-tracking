@@ -19,10 +19,13 @@ void loop() {
     if (Serial.available()) {
         // get command string
         command = getString();
-        Serial.println("Command received:" + command);
+        //Serial.println("Command received:" + command);
 
         // give command to connected module
-        mySerial.println(command);
+        if (command != "z")    
+            mySerial.println(command);
+        else
+            Serial.println("Entered CTRL+Z");
         command = "";
     }
 
@@ -33,7 +36,7 @@ void loop() {
 }
 
 
-// get string from serial monitor
+// get string from serial monitorm
 String getString() {
     String string = "";
     char c = Serial.read();
@@ -45,6 +48,14 @@ String getString() {
         string += c;
         delay(10);
     }
+    if (string == "z") {
+        enterCTRLZ();
+        return "z";
+    }
+    else
+        return string;
+}
 
-    return string;
+void enterCTRLZ() {
+    mySerial.println((char)26);
 }
