@@ -1,15 +1,15 @@
 #include<SoftwareSerial.h>
 
 String command = "";
-float lat = 15.41;
-float lng = 54.75;
+float lat = 17.41;
+float lng = 24.75;
 // define serial Communication for Arduino-GSM
-SoftwareSerial gps(9, 11); // 9 is RX, 11 is TX of Arduino
+SoftwareSerial gsm(8, 9); // 8 is RX, 9 is TX of Arduino
 
 
 void setup() {
     // set baud rate for GSM-Arduino
-    gps.begin(9600);
+    gsm.begin(9600);
     // set baud rate for Arduino-PC
     Serial.begin(9600);
 
@@ -25,7 +25,7 @@ void loop() {
 
         // give command to connected module
         if (command != "z")    
-            gps.println(command);
+            gsm.println(command);
         else {
             Serial.println("Entered CTRL+Z");
             enterCTRLZ();
@@ -34,8 +34,8 @@ void loop() {
     }
 
     // if available, print response on serial monitor
-    if (gps.available()) {
-        Serial.write(gps.read());
+    if (gsm.available()) {
+        Serial.write(gsm.read());
     }
 }
 
@@ -82,10 +82,22 @@ String getString() {
         
     else if (string == "cifsr")
         return "AT+CIFSR";
+    
+    else if (string == "cipst")
+        return "AT+CIPSTART=\"TCP\",\"script.google.com\",\"80\"";
         
+    else if (string == "cipst2")
+        return "AT+CIPSTART=\"TCP\",\"api.thingspeak.com\",\"80\"";    
+    
     else if (string == "cipsend")
         return "AT+CIPSEND";
     
+    else if (string == "OKOK") {
+        lat = lat + 1.0;
+        lng = lng + 1.0;
+        return "GET /macros/s/AKfycbysxw0m3rVjn70l7otnWSXp4MqB9kQm0zkInr1285hqHnPJprFI/exec/";
+    }
+
     else if (string == "sap31gprs")
         return "AT+SAPBR=3,1,\"Contype\",\"GPRS\"";
     
@@ -107,8 +119,22 @@ String getString() {
     else if (string == "url") {
         lat = lat + 1.0;
         lng = lng + 1.0;
-        return "AT+HTTPPARA=\"URL\",\"<url you want to request>\"";
+        return "AT+HTTPPARA=\"URL\",\"http://api.pushingbox.com/pushingbox?devid=v667F45BF8DFF91D&lat=";
+        //return "AT+HTTPPARA=\"URL\",\"http://api.pushingbox.com/pushingbox?devid=v667F45BF8DFF91D&lat=" + String(lat) + "&lng=" + String(lng) + "\"";
     }        
+
+//    else if (string == "break1")
+//        return "AT+HTTPPARA=\"BREAK\",\"AKfycbysxw0m3rVjn70l7otnWSXp\"";
+//        
+//    else if (string == "break2")
+//        return "AT+HTTPPARA=\"BREAK\",\"4MqB9kQm0zkInr1285hqHnPJprFI/exec?\"";
+//        
+//    else if (string == "data")
+//        return "AT+HTTPDATA=43,15000";
+//        
+//    else if (string == "insert")
+//        return "key=AIzaSyCP8v4yevlVewiG16cIjr_WNrZw8eoptcU";
+//        //return "lat=17&lng=26";
  
     else if (string == "term")
         return "AT+HTTPTERM";
@@ -126,5 +152,5 @@ String getString() {
 //lat=" + String(lat) + "&lng=" + String(lng)
 
 void enterCTRLZ() {
-    gps.println((char)26);
+    gsm.println((char)26);
 }
