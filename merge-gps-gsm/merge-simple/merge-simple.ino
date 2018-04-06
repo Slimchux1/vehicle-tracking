@@ -247,7 +247,7 @@ void initGSM() {
 }
 
 void updateDataOnSheet(String time, String lat, String lng) {
-	// command to make a GET HTTP request 
+	// command to make a GET HTTP request
 	String command = "AT+HTTPPARA=\"URL\",\"<url>&lat=" + String(lat) + "&lng=" + String(lng) + "\"";
 	gsm.println(command);
 	gsm.flush();
