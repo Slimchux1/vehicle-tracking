@@ -68,7 +68,7 @@ void loop() {
     delay(1000);
 
     Serial.println("exec url");
-    gsm.println("AT+HTTPPARA=\"URL\",\"http://api.pushingbox.com/pushingbox?devid=v667F45BF8DFF91D&lat=" + String(lat) + "&lng=" + String(lng) + "\"");
+    gsm.println("AT+HTTPPARA=\"URL\",\"http://api.pushingbox.com/pushingbox?devid=<ID>&lat=" + String(lat) + "&lng=" + String(lng) + "\"");
     waitFor("OK");
     delay(1000);
 

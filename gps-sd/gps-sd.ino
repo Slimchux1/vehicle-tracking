@@ -13,11 +13,15 @@ void setup() {
     Serial.begin(9600);
     GPSModule.begin(9600);
     pinMode(pinCS,OUTPUT);
-    
-    if (!SD.begin()) {
-        // don't do anything more 
-        Serial.println("failed");
-    } 
+	delay(2000);
+	
+	if (!SD.begin()) {
+		// don't do anything more 
+    	Serial.println("failed");
+		while (1) {
+			delay(10000);
+		}
+	} 
 	else {
     	Serial.println("ok");
     }
@@ -35,6 +39,7 @@ void loop() {
 	}
 
 	if (GPSModule.find("$GPGGA,")) {
+		// extract req data from GPS output
 		extractData();
 
 		// write to SD card if GPS is fixed
@@ -43,8 +48,62 @@ void loop() {
 		}
 	}
 
-	printToSerialMonitor();
+	//printToSerialMonitor();
 }
+
+
+void writeToSD() {
+	nmea[1] = ConvertLat();
+	nmea[3] = ConvertLng();
+
+	// Serial.println("\n<<<<<<<<<<<Lat:" + nmea[1] + "  Lng:" + nmea[3] + ">>>>>>>>>>>>>\n");
+
+	dataFile = SD.open("gps_test.csv", FILE_WRITE);
+	// write if dataFile is succesfully created/opened
+	if (dataFile) {
+		// Serial.println("writing");
+
+		// time
+		dataFile.print(nmea[0]);
+		dataFile.print(",");
+
+		// latitude
+		dataFile.print(nmea[1]);
+		dataFile.print(",");
+
+		// longitude
+		dataFile.print(nmea[3]);
+		dataFile.println("");
+
+		// Serial.println("writing ends!");
+	}
+	else {
+		// Serial.println("error");
+	}
+
+	dataFile.close();
+}
+
+
+// extract data from output string of GPS
+void extractData() {
+	short int stringStartIndex = 0, stringEndIndex = 0;
+
+	String tempMsg = GPSModule.readStringUntil('\n');
+	// Serial.println(tempMsg);
+	// extract meaningful data
+	for (int i = 0; i < 6; i++) {
+		// find index where comma is
+		while (tempMsg[stringEndIndex] != ',')
+			stringEndIndex++;
+
+		// copy substring of tempMsg from startIndex to EndIndex
+		nmea[i] = tempMsg.substring(stringStartIndex, stringEndIndex);
+		stringStartIndex = stringEndIndex + 1;
+		stringEndIndex++;
+	}
+}
+
 
 String ConvertLat() {
 	String posneg = "";
@@ -75,6 +134,7 @@ String ConvertLat() {
 	latfirst = posneg += latfirst;
 	return latfirst;
 }
+
 
 String ConvertLng() {
   	String posneg = "";
@@ -108,57 +168,9 @@ String ConvertLng() {
 	return lngfirst;
 }
 
-void writeToSD() {
-	nmea[1] = ConvertLat();
-	nmea[3] = ConvertLng();
 
-	Serial.println("\n<<<<<<<<<<<Lat:" + nmea[1] + "  Lng:" + nmea[3] + ">>>>>>>>>>>>>\n");
-
-	dataFile = SD.open("gps.csv", FILE_WRITE);
-	// write if dataFile is succesfully created/opened
-	if (dataFile) {
-		Serial.println("writing");
-
-		// time
-		dataFile.print(nmea[0]);
-		dataFile.print(",");
-
-		// latitude
-		dataFile.print(nmea[1]);
-		dataFile.print(",");
-
-		// longitude
-		dataFile.print(nmea[3]);
-		dataFile.println("");
-
-		Serial.println("writing ends!");
-	} else {
-		Serial.println("error");
-	}
-
-	dataFile.close();
-}
-
-void extractData() {
-	short int stringStartIndex = 0, stringEndIndex = 0;
-
-	String tempMsg = GPSModule.readStringUntil('\n');
-
-	// extract meaningful data
-	for (int i = 0; i < 6; i++) {
-		// find index where comma is
-		while (tempMsg[stringEndIndex] != ',')
-			stringEndIndex++;
-
-		// copy substring of tempMsg from startIndex to EndIndex
-		nmea[i] = tempMsg.substring(stringStartIndex, stringEndIndex);
-		stringStartIndex = stringEndIndex + 1;
-		stringEndIndex++;
-	}
-}
-
+// Print out data to the Serial Monitor
 void printToSerialMonitor() {
-	// Print out data to the Serial Monitor
 	for (int i = 0; i < 6; i++) {
 		Serial.print(nmea[i]);
 		Serial.println("");
