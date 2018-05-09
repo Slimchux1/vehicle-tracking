@@ -4,10 +4,10 @@
 File dataFile;
 
 SoftwareSerial GPSModule(2, 3); // 2 is RX, 3 is TX of Arduino
-SoftwareSerial gsm(8, 9);    // 8 is RX, 9 is TX of Arduino
+SoftwareSerial gsm(7, 8);    // 7 is RX, 8 is TX of Arduino
 
 // update freq on google sheet
-const unsigned short int interval = 10000; // in seconds
+const unsigned short int interval = 20000; // in milliseconds
 unsigned int prevMillis = millis(), currentMillis;
 
 const short int SIZE = 6;
@@ -99,7 +99,7 @@ void writeToSD() {
 
     // Serial.println("\n<<<<<<<<<<<Lat:" + nmea[1] + "  Lng:" + nmea[3] + ">>>>>>>>>>>>>\n");
 
-    dataFile = SD.open("MERGETEST.CSV", FILE_WRITE);
+    dataFile = SD.open("MERGETEST10MAY.CSV", FILE_WRITE);
     // write if dataFile is succesfully created/opened
     if (dataFile) {
         // Serial.println("writing");
@@ -131,66 +131,91 @@ void writeToSD() {
 void initGSM() {
     Serial.println("initialising gsm");
 
-    Serial.println("exec cipmode");
-    // set non-transparent mode
-    gsm.println("AT+CIPMODE=0");
-    waitFor("OK");
-    delay(5000);
-
-    Serial.println("exec cipmux");
-    // set single connection mode
-    gsm.println("AT+CIPMUX=0");
-    waitFor("OK");
-    delay(5000);
-
-    Serial.println("exec cgatt");
-    // enable GPRS
-    gsm.println("AT+CGATT=1");
-    waitFor("OK");
-    delay(5000);
-
-    Serial.println("exec sap31gprs");
-    // set connection type to GPRS
-    gsm.println("AT+SAPBR=3,1,\"Contype\",\"GPRS\"");
-    waitFor("OK");
-    delay(5000);
-
-    Serial.println("exec sap31apn");
-    // set APN according to your network provider
-    gsm.println("AT+SAPBR=3,1,\"APN\",\"airtelgprs.com\"");
-    waitFor("OK");
-    delay(5000);
-
-    Serial.println("exec sap11");
-    gsm.println("AT+SAPBR=1,1");
-    waitFor("ERROR");
-    delay(5000);
-
-    Serial.println("exec sap21");
-    gsm.println("AT+SAPBR=2,1");
-    waitFor("OK");
-    delay(5000);
-
-    Serial.println("exec httpterm");
+    // Serial.println("exec httpterm");
     // terminate existing connection
-    gsm.println("AT+HTTPTERM");
+    sendToGSM("AT+HTTPTERM");
+    delay(5000);
+
+    // Serial.println("exec cpin");
+    sendToGSM("AT+CPIN?");
+    delay(5000);
+
+    // Serial.println("exec cipmode");
+    // set non-transparent mode
+    sendToGSM("AT+CIPMODE=0");
     waitFor("OK");
     delay(5000);
 
-    Serial.println("exec httpinit");
+    // Serial.println("exec cipmux");
+    // set single connection mode
+    sendToGSM("AT+CIPMUX=0");
+    waitFor("OK");
+    delay(5000);
+
+    // Serial.println("exec cgatt");
+    // enable GPRS
+    sendToGSM("AT+CGATT=1");
+    waitFor("OK");
+    delay(10000);
+
+    // Serial.println("exec sap31gprs");
+    // set connection type to GPRS
+    sendToGSM("AT+SAPBR=3,1,\"Contype\",\"GPRS\"");
+    waitFor("OK");
+    delay(5000);
+
+    // Serial.println("exec sap31apn");
+    // set APN according to your network provider
+    sendToGSM("AT+SAPBR=3,1,\"APN\",\"internet\"");
+    waitFor("OK");
+    delay(7000);
+
+    // Serial.println("exec sap11");
+    sendToGSM("AT+SAPBR=1,1");
+    waitFor("OK");
+    delay(5000);
+
+    // Serial.println("exec sap21");
+    sendToGSM("AT+SAPBR=2,1");
+    waitFor("OK");
+    delay(3000);
+
+    // Serial.println("exec httpinit");
     // initialise HTTP connection
-    gsm.println("AT+HTTPINIT");
+    sendToGSM("AT+HTTPINIT");
     waitFor("OK");
-    delay(5000);
+    delay(3000);
 
-    Serial.println("exec cid");
+    // Serial.println("exec cid");
     // set barrier profile
-    gsm.println("AT+HTTPPARA=\"CID\",1");
+    sendToGSM("AT+HTTPPARA=\"CID\",1");
     waitFor("OK");
     delay(5000);
 
-    updateDataOnSheet("null", "null");
+    updateDataOnSheet("init", "done");
     Serial.println("initialisation done!");
+}
+/********************************************************************************************/
+
+
+/********************************************************************************************/
+// send commands by breaking in parts
+void sendToGSM(String s) {
+    int len = (int)s.length();
+
+    if (len < 12)
+        gsm.println(s);
+    else {
+        String subString = "";
+        for (int i = 0; i < len; i = i + 10) {
+            if (i + 10 < len)
+                subString = s.substring(i, i + 10);
+            else
+                subString = s.substring(i);
+            gsm.print(subString);
+        }
+        gsm.println("");
+    }
 }
 /********************************************************************************************/
 
@@ -200,14 +225,13 @@ void updateDataOnSheet(String lat, String lng) {
     Serial.println("exec url");
     
     // make a request to url
-    gsm.print("AT+HTTPPARA=\"URL\",\"<url>\"");
-    
+    sendToGSM("AT+HTTPPARA=\"URL\",\"<url>&lat=" + lat + "&lng=" + lng + "\"");
     waitFor("OK");
     delay(5000);
 
     Serial.println("exec action");
     //  send request
-    gsm.println("AT+HTTPACTION=1");
+    sendToGSM("AT+HTTPACTION=1");
     waitFor("OK");
     delay(5000);
 }
@@ -246,8 +270,9 @@ void waitFor(String response) {
 void printToSerialMonitor() {
     for (int i = 0; i < SIZE; i++) {
         Serial.print(nmea[i]);
-        Serial.println("");
+        Serial.print(" ");
     }
+    Serial.println("");
 }
 /********************************************************************************************/
 

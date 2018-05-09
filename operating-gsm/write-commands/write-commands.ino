@@ -2,7 +2,7 @@
 
 String command = "";
 // define serial Communication for Arduino-GSM
-SoftwareSerial mySerial(8, 9); // 9 is RX, 11 is TX of Arduino
+SoftwareSerial mySerial(8, 7); // 8 is RX, 7 is TX of Arduino
 
 
 void setup() {
@@ -21,9 +21,11 @@ void loop() {
         command = getString();
         //Serial.println("Command received:" + command);
 
+        if (command == "*")
+            mySerial.println("");
         // give command to connected module
-        if (command != "z")    
-            mySerial.println(command);
+        else if (command != "z")    
+            mySerial.print(command);
         else
             Serial.println("Entered CTRL+Z");
         command = "";

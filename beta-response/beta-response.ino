@@ -1,82 +1,87 @@
 #include <SoftwareSerial.h>
 
-SoftwareSerial gsm(8, 9);       // 8 is RX, 9 is TX of Arduino
+SoftwareSerial gsm(7, 8);       // 8 is RX, 7 is TX of Arduino
 char c;
 int lat = 15;
-int lng = 17;
+int lng = 56;
 
 void setup() {
     Serial.begin(9600);
     gsm.begin(9600);
     delay(1000);
+    initGSM();
 }
 
 void loop() {
-    Serial.println("exec cpin");
-    gsm.println("AT+CPIN?");
+    Serial.println("exec url");
+    send("AT+HTTPPARA=\"URL\",\"<url>&lat=" + String(lat) + "&lng=" + String(lng) + "\"");
     waitFor("OK");
+    delay(2000);
+
+    Serial.println("exec action");
+    send("AT+HTTPACTION=1");
+    waitFor("OK");
+    delay(5000);
+    lat += 2;
+    lng -= 1;
+}
+
+void initGSM() {
+    Serial.println("terminate http");
+    send("AT+HTTPTERM");
+    delay(1000);
+
+    Serial.println("exec cpin");
+    send("AT+CPIN?");
+    // waitfor("OK");
     delay(1000);
 
     Serial.println("exec cipmode");
-    gsm.println("AT+CIPMODE?");
-    waitFor("0");
+    send("AT+CIPMODE=0");
+    waitFor("OK");
     delay(1000);
 
     Serial.println("exec cipmux");
-    gsm.println("AT+CIPMUX?");
-    waitFor("0");
+    send("AT+CIPMUX=0");
+    waitFor("OK");
     delay(1000);
 
     Serial.println("exec cgatt");
-    gsm.println("AT+CGATT=1");
+    send("AT+CGATT=1");
     waitFor("OK");
     delay(1000);
 
     Serial.println("exec sap31gprs");
-    gsm.println("AT+SAPBR=3,1,\"Contype\",\"GPRS\"");
+    send("AT+SAPBR=3,1,\"Contype\",\"GPRS\"");
     waitFor("OK");
     delay(1000);
 
     Serial.println("exec sap31apn");
-    gsm.println("AT+SAPBR=3,1,\"APN\",\"airtelgprs.com\"");
+    send("AT+SAPBR=3,1,\"APN\",\"internet\"");
     waitFor("OK");
     delay(1000);
 
     Serial.println("exec sap11");
-    gsm.println("AT+SAPBR=1,1");
-    waitFor("ERROR");
-    delay(1000);
-
-    Serial.println("exec sap21");
-    gsm.println("AT+SAPBR=2,1");
+    send("AT+SAPBR=1,1");
     waitFor("OK");
     delay(1000);
 
-    Serial.println("exec httpterm");
-    gsm.println("AT+HTTPTERM");
+    Serial.println("exec sap21");
+    send("AT+SAPBR=2,1");
     waitFor("OK");
     delay(1000);
 
     Serial.println("exec httpinit");
-    gsm.println("AT+HTTPINIT");
+    send("AT+HTTPINIT");
     waitFor("OK");
     delay(1000);
 
     Serial.println("exec cid");
-    gsm.println("AT+HTTPPARA=\"CID\",1");
-    waitFor("OK");
-    delay(1000);
-
-    Serial.println("exec url");
-    gsm.println("AT+HTTPPARA=\"URL\",\"http://api.pushingbox.com/pushingbox?devid=<ID>&lat=" + String(lat) + "&lng=" + String(lng) + "\"");
-    waitFor("OK");
-    delay(1000);
-
-    Serial.println("exec action");
-    gsm.println("AT+HTTPACTION=1");
+    send("AT+HTTPPARA=\"CID\",1");
     waitFor("OK");
     delay(1000);
 }
+
 
 void waitFor(String response) {   
     int index = 0;
@@ -100,3 +105,21 @@ void waitFor(String response) {
     Serial.println(" ");   
 }
 
+
+void send(String s) {
+    int len = (int) s.length();
+    
+    if (len < 12)
+        gsm.println(s);
+    else {
+        String subString = "";
+        for (int i = 0; i < len; i = i+10) {
+            if (i + 10 < len)
+                subString = s.substring(i, i + 10);
+            else
+                subString = s.substring(i);
+            gsm.print(subString);
+        }
+        gsm.println("");
+    }
+}
