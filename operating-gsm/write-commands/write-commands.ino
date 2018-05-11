@@ -2,7 +2,7 @@
 
 String command = "";
 // define serial Communication for Arduino-GSM
-SoftwareSerial mySerial(8, 7); // 8 is RX, 7 is TX of Arduino
+SoftwareSerial mySerial(7, 8); // 7 is RX, 8 is TX of Arduino
 
 
 void setup() {
