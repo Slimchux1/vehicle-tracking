@@ -172,7 +172,7 @@ void initGSM() {
 
     // Serial.println("exec sap11");
     sendToGSM("AT+SAPBR=1,1");
-    waitFor("OK");
+    // waitFor("OK");
     delay(5000);
 
     // Serial.println("exec sap21");
@@ -225,7 +225,7 @@ void updateDataOnSheet(String lat, String lng) {
     Serial.println("exec url");
     
     // make a request to url
-    sendToGSM("AT+HTTPPARA=\"URL\",\"<url>&lat=" + lat + "&lng=" + lng + "\"");
+    sendToGSM("AT+HTTPPARA=\"URL\",\"http://api.pushingbox.com/pushingbox?devid=v15D42B5FCC6D626&lat=" + lat + "&lng=" + lng + "\"");
     waitFor("OK");
     delay(5000);
 

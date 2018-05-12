@@ -1,5 +1,5 @@
 void printToSerialMonitor() {
-    for (int i = 0; i < SIZE; i++) {
+    for (int unsigned i = 0; i < SIZE; i++) {
         Serial.print(nmea[i]);
         Serial.print(" ");
     }

@@ -1,7 +1,7 @@
 void writeToSD() {
     // Serial.println("\n<<<<<<<<<<<Lat:" + nmea[1] + "  Lng:" + nmea[3] + ">>>>>>>>>>>>>\n");
 
-    File dataFile = SD.open("MERGETEST10MAY.CSV", FILE_WRITE);
+    File dataFile = SD.open("MERGETEST11MAY.CSV", FILE_WRITE);
     // write if dataFile is succesfully created/opened
     if (dataFile) {
         // Serial.println("writing");

@@ -1,9 +1,11 @@
 void blinkForever() {
     Serial.println(F("blinking"));
     while (true) {
+        digitalWrite(5, HIGH);
         digitalWrite(LED_BUILTIN, HIGH);
-        delay(1000);  
+        delay(100);  
         digitalWrite(LED_BUILTIN, LOW);
-        delay(1000);
+        digitalWrite(5, LOW);
+        delay(100);
     }
 }

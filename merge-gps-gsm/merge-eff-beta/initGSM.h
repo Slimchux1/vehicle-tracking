@@ -1,101 +1,115 @@
 void initGSM() {
     String response = "";
+    digitalWrite(5, LOW);
     Serial.println(F("initialising gsm"));
 
-    Serial.println(F("exec httpterm"));
+    // Serial.println(F("exec httpterm"));
     // terminate existing connection
-    sendToGSM("AT+HTTPTERM");
+    sendToGSMCharByChar(F("AT+HTTPTERM"));
+    digitalWrite(5, HIGH);
     delay(2000);
+    digitalWrite(5, LOW);
     response = getResponse(10);
-    if (!(response.equals("OK") || response.equals("ERROR")))
+    if (!(response.endsWith(F("OK")) || response.endsWith(F("ERROR"))))
         blinkForever();
 
-    Serial.println(F("exec cpin"));
+    // Serial.println(F("exec cpin"));
     // gsm.flush();
-    sendToGSM("AT+CPIN?");
+    sendToGSMCharByChar(F("AT+CPIN?"));
     delay(2000);
+    digitalWrite(5, HIGH);
     response = getResponse(10);
-    if (!response.equals("READYOK"))
+    if (!response.endsWith(F("READYOK")))
         blinkForever();
 
-    Serial.println(F("exec cipmode"));
+    // Serial.println(F("exec cipmode"));
     // gsm.flush();
     // set non-transparent mode
-    sendToGSM("AT+CIPMODE=0");
+    sendToGSMCharByChar(F("AT+CIPMODE=0"));
     delay(3000);
+    digitalWrite(5, LOW);
     response = getResponse(10);
-    if (!response.equals("OK"))
+    if (!response.endsWith(F("OK")))
         blinkForever();
     
-    Serial.println(F("exec cipmux"));
+    // Serial.println(F("exec cipmux"));
     // gsm.flush();
     // set single connection mode
-    sendToGSM("AT+CIPMUX=0");
+    sendToGSMCharByChar(F("AT+CIPMUX=0"));
     delay(3000);
+    digitalWrite(5, HIGH);
     response = getResponse(9);
-    if (!response.equals("OK"))
+    if (!response.endsWith(F("OK")))
         blinkForever();
 
-    Serial.println(F("exec cgatt"));
+    // Serial.println(F("exec cgatt"));
     // gsm.flush();
     // enable GPRS
-    sendToGSM("AT+CGATT=1");
+    sendToGSMCharByChar(F("AT+CGATT=1"));
     delay(10000);
+    digitalWrite(5, LOW);
     response = getResponse(8);
-    if (!response.equals("OK"))
+    if (!response.endsWith(F("OK")))
         blinkForever();
 
-    Serial.println(F("exec sap31gprs"));
+    // Serial.println(F("exec sap31gprs"));
     // gsm.flush();
     // set connection type to GPRS
-    sendToGSM("AT+SAPBR=3,1,\"Contype\",\"GPRS\"");
+    sendToGSMCharByChar(F("AT+SAPBR=3,1,\"Contype\",\"GPRS\""));
     delay(10000);
+    digitalWrite(5, HIGH);
     response = getResponse(20);
-    if (!response.equals("OK"))
+    if (!response.endsWith(F("OK")))
         blinkForever();
 
-    Serial.println(F("exec sap31apn"));
+    // Serial.println(F("exec sap31apn"));
     // gsm.flush();
     // set APN according to your network provider
-    sendToGSM("AT+SAPBR=3,1,\"APN\",\"internet\"");
+    sendToGSMCharByChar(F("AT+SAPBR=3,1,\"APN\",\"internet\""));
     delay(10000);
+    digitalWrite(5, LOW);
     response = getResponse(20);
-    if (!response.equals("OK"))
+    if (!response.endsWith(F("OK")))
         blinkForever();
     
-    Serial.println(F("exec sap11"));
+    // Serial.println(F("exec sap11"));
     // gsm.flush();
-    sendToGSM("AT+SAPBR=1,1");
+    sendToGSMCharByChar(F("AT+SAPBR=1,1"));
     delay(15000);
+    digitalWrite(5, HIGH);
     response = getResponse(9);
-    if (!response.equals("OK") && !response.equals("ERROR"))
+    if (!response.endsWith(F("OK")) && !response.endsWith(F("ERROR")))
         blinkForever();
 
-    Serial.println(F("exec sap21"));
+    // Serial.println(F("exec sap21"));
     // gsm.flush();
-    sendToGSM("AT+SAPBR=2,1");
+    sendToGSMCharByChar(F("AT+SAPBR=2,1"));
     delay(2000);
+    digitalWrite(5, LOW);
     getResponse(9);
     delay(3000);
 
-    Serial.println(F("exec httpinit"));
+    // Serial.println(F("exec httpinit"));
     // initialise HTTP connection
     // gsm.flush();
-    sendToGSM("AT+HTTPINIT");
+    sendToGSMCharByChar(F("AT+HTTPINIT"));
     delay(3000);
+    digitalWrite(5, HIGH);
     response = getResponse(10);
-    if (!response.equals("OK"))
+    if (!response.endsWith(F("OK")))
         blinkForever();
     
-    Serial.println(F("exec cid"));
+    // Serial.println(F("exec cid"));
     // gsm.flush();
     // set barrier profile
-    sendToGSM(F("AT+HTTPPARA=\"CID\",1"));
+    sendToGSMCharByChar(F("AT+HTTPPARA=\"CID\",1"));
     delay(3000);
+    digitalWrite(5, LOW);
     response = getResponse(14);
-    if (!response.equals("OK"))
+    if (!response.endsWith(F("OK")))
         blinkForever();
-    
-    updateDataOnSheet("init", "done");
+
+    updateDataOnSheet(F("init"), F("done"));
     Serial.println(F("initialisation done!"));
+    digitalWrite(5, LOW);
 }

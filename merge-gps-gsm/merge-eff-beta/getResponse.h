@@ -4,8 +4,8 @@ String getResponse(short int skipLength) {
     while (skipLength > 0) {
         if (gsm.available()) {
             c = (char)gsm.read();
-            if (isalpha(c) || isdigit(c)) {
-                Serial.print(c);
+            if (isAlphaNumeric(c)) {
+                // Serial.print(c);
                 skipLength--;
             }
         }
@@ -14,9 +14,9 @@ String getResponse(short int skipLength) {
     String res = "";
     while (gsm.available()) {
         c = (char) gsm.read();
-        if (isalpha(c) || isdigit(c))
+        if (isAlphaNumeric(c))
             res.concat(c);
     }
-    Serial.println(res);
+    // Serial.println(res);
     return res;
 }

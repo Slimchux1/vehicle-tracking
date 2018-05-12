@@ -5,8 +5,7 @@ void extractData() {
     String tempMsg = GPSModule.readStringUntil('\n');
     // Serial.println(tempMsg);
     // extract meaningful data
-    for (short int i = 0; i < SIZE; i++)
-    {
+    for (short unsigned int i = 0; i < SIZE; i++) {
         // find index where comma is
         while (tempMsg[stringEndIndex] != ',')
             stringEndIndex++;

@@ -18,9 +18,6 @@ void setup() {
 	if (!SD.begin()) {
 		// don't do anything more 
     	Serial.println("failed");
-		while (1) {
-			delay(10000);
-		}
 	} 
 	else {
     	Serial.println("ok");
@@ -35,20 +32,22 @@ void loop() {
 	GPSModule.flush();
 
 	while (GPSModule.available() > 0) {
-		GPSModule.read();
+		Serial.write(GPSModule.read());
 	}
-
+  
 	if (GPSModule.find("$GPGGA,")) {
+    Serial.println("GPS data extracted");
 		// extract req data from GPS output
 		extractData();
-
+    Serial.println("GPS data extracted");
+    
 		// write to SD card if GPS is fixed
    		if(nmea[5].toInt() > 0){
-			writeToSD();
+			    writeToSD();
 		}
 	}
 
-	//printToSerialMonitor();
+	printToSerialMonitor();
 }
 
 
@@ -132,6 +131,7 @@ String ConvertLat() {
 
 	latfirst += CalcLat.substring(1);
 	latfirst = posneg += latfirst;
+  Serial.println(latfirst);
 	return latfirst;
 }
 
@@ -164,7 +164,7 @@ String ConvertLng() {
 
 	lngfirst += CalcLng.substring(1);
 	lngfirst = posneg += lngfirst;
-
+  Serial.println(lngfirst);
 	return lngfirst;
 }
 
