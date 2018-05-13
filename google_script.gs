@@ -1,5 +1,7 @@
-var sheet = SpreadsheetApp.getActiveSheet();
-var count = sheet.getRange(2,2).getValues();
+var ss = SpreadsheetApp.getActiveSpreadsheet();
+var mainSheet = ss.getSheets()[0];
+var historySheet = ss.getSheets()[1];
+var count = mainSheet.getRange(2,2).getValues();
 
 function doGet(e) {
 	// return HtmlService.createHtmlOutputFromFile('index');
@@ -10,8 +12,11 @@ function doGet(e) {
 }
 
 function add(s1, s2) {
-    sheet.deleteRow(sheet.getLastRow());
-    Logger.log(count[0][0]);
+	// update in mainSheet
+    mainSheet.deleteRow(mainSheet.getLastRow());
     count[0][0] += 1; 
-    sheet.appendRow([new Date(), count[0][0], s1, s2]);
+    mainSheet.appendRow([new Date(), count[0][0], s1, s2]);
+    
+    // append in historySheet
+    historySheet.appendRow([new Date(), s1, s2]);
 }
