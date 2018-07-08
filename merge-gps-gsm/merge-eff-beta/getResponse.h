@@ -10,13 +10,16 @@ String getResponse(short int skipLength) {
             }
         }
     }
-    Serial.println("");
-    String res = "";
+
+   String res = "";
     while (gsm.available()) {
         c = (char) gsm.read();
         if (isAlphaNumeric(c))
-            res.concat(c);
+           res.concat(c);
     }
+    
+    // Serial.print(F("response:"));
     // Serial.println(res);
     return res;
+    // return "";
 }

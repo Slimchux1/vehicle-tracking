@@ -4,7 +4,7 @@
 
 SoftwareSerial GPSModule(2, 3); // 2 is RX, 3 is TX of Arduino
 SoftwareSerial gsm(7, 8);    // 7 is RX, 8 is TX of Arduino
-unsigned int prevMillis = millis(), currentMillis;
+unsigned long int prevMillis = millis(), currentMillis;
 const short int SIZE = 6;
 String nmea[SIZE];
 bool isSDAvail;
@@ -77,13 +77,11 @@ void loop() {
         
         // write to SD card if GPS is fixed
         if (nmea[5].toInt() > 0) {
-            Serial.println("GPS availabel");
-            digitalWrite(5, HIGH);
+            Serial.println("GPS available");
             nmea[1] = ConvertLat();
             nmea[3] = ConvertLng();
             if (isSDAvail)
               writeToSD();
-            digitalWrite(5, LOW);
         }
     } else {
         Serial.println("gps not available");

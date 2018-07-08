@@ -1,14 +1,16 @@
 #include<SoftwareSerial.h>
 
 //define our serial Communication
-SoftwareSerial mySerial(9, 11); // 9 is RX, 11 is TX
+SoftwareSerial mySerial(7,8); // 9 is RX, 11 is TX
 
 void setup() {
+    Serial.begin(9600);
     // setup baud rate for GSM
     mySerial.begin(9600);
+    mySerial.println("AT");
     // setup baud rate for Arduino-PC
-    Serial.begin(9600);
-
+    
+    Serial.println("done!");
     delay(1000);
 }
 
@@ -43,7 +45,7 @@ void SendMessage(String message) {
     delay(1000);
 
     // set reciever's mobile no.
-    mySerial.println("AT+CMGS=\"+917093378810\"\r");
+    mySerial.println("AT+CMGS=\"+918758536303\"\r");
 
     delay(1000);
 

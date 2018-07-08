@@ -1,11 +1,14 @@
 void updateDataOnSheet(String lat, String lng) {
+    digitalWrite(5, HIGH);
+    // Serial.println(F("updating on sheet"));
+    
     String response = "";
     // Serial.println(F("exec url"));
     // make a request to url
     // gsm.flush();
-    sendToGSMCharByChar("AT+HTTPPARA=\"URL\",\"http://api.pushingbox.com/pushingbox?devid=v15D42B5FCC6D626&lat=" + lat + "&lng=" + lng + "\"");
+    sendToGSMCharByChar("AT+HTTPPARA=\"URL\",\"<insert url here>&lat=" + lat + "&lng=" + lng + "\"");
     delay(20000);
-    response = getResponse(33);
+    response = getResponse(35);
     /*if (!response.endsWith(F("OK"))) {
         initGSM();
         return;
@@ -21,4 +24,7 @@ void updateDataOnSheet(String lat, String lng) {
         initGSM();
         return;
     }
+
+    // Serial.println(F("data sent"));
+    digitalWrite(5, LOW);
 }

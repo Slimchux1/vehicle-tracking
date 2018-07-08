@@ -16,11 +16,11 @@ void setup() {
 
 
 void loop() {
-    if (Serial.available()) {
+    if (Serial.available()) { 
         // get command string
         command = getString();
         //Serial.println("Command received:" + command);
-
+    
         if (command == "*")
             mySerial.println("");
         // give command to connected module
